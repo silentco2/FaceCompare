@@ -1,0 +1,210 @@
+.face-compare-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 100vh;
+    height: 100vh;
+    width: 100%;
+    padding: 2rem 2.5rem 1.5rem 2.5rem;
+    box-sizing: border-box;
+    background: radial-gradient(circle at 50% 20%, #1e293b 0%, #0f172a 100%);
+    color: #f8fafc;
+    user-select: none;
+    overflow: hidden;
+}
+
+/* Header on very top center */
+.app-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.header-title {
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: #f8fafc;
+    margin: 0;
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    outline: none;
+    border: none;
+}
+
+.header-title:focus,
+.header-title:focus-visible {
+    outline: none;
+    border: none;
+}
+
+/* Middle photo columns section */
+.photo-columns-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    max-width: 950px;
+    flex: 1;
+    min-height: 0;
+    gap: 3rem;
+    padding: 0.5rem 0;
+}
+
+.photo-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    max-width: 420px;
+    min-width: 0;
+    height: 100%;
+    gap: 1.25rem;
+}
+
+/* Reserved space for preview above the button */
+.preview-wrapper {
+    width: 100%;
+    max-width: 360px;
+    height: 320px;
+    max-height: 48vh;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    background: transparent;
+    border: none;
+    outline: none;
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.5), 0 8px 12px -6px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    transition: transform 0.2s ease;
+}
+
+/* Buttons */
+.action-btn {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    text-decoration: none;
+}
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+    color: #ffffff;
+    padding: 0.75rem 1.75rem;
+    box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.4);
+    white-space: nowrap;
+}
+
+.upload-btn:hover {
+    background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.55);
+}
+
+.upload-btn:active {
+    transform: translateY(0);
+}
+
+.hidden-file-input {
+    display: none !important;
+}
+
+.error-msg {
+    color: #f87171;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Footer & Compare Button */
+.app-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0.85rem;
+    margin-top: auto;
+    padding-bottom: 0.5rem;
+}
+
+.compare-btn {
+    background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+    color: #ffffff;
+    padding: 0.85rem 3.5rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px 0 rgba(37, 99, 235, 0.4);
+    letter-spacing: 0.02em;
+}
+
+.compare-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(37, 99, 235, 0.55);
+}
+
+.compare-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.compare-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Result text area at the very bottom center */
+.result-wrapper {
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+}
+
+.result-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    padding: 0.35rem 1.5rem;
+    border-radius: 8px;
+}
+
+.match-text {
+    color: #34d399;
+    text-shadow: 0 0 16px rgba(52, 211, 153, 0.5);
+}
+
+.no-match-text {
+    color: #f87171;
+    text-shadow: 0 0 16px rgba(248, 113, 113, 0.5);
+}

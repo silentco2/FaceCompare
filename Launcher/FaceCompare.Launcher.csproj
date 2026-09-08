@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PublishSingleFile>true</PublishSingleFile>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        <ApplicationTitle>FaceCompare</ApplicationTitle>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="..\release\FaceCompare-Windows-x64.zip" LogicalName="app_payload.zip" />
+    </ItemGroup>
+
+</Project>

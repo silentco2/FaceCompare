@@ -1,0 +1,247 @@
+@page "/"
+
+<div class="face-compare-container">
+    <!-- Top Header -->
+    <header class="app-header">
+        <h1 class="header-title">Is This  the Same Person</h1>
+    </header>
+
+    <!-- Middle Photo Comparison Section -->
+    <section class="photo-columns-section">
+        <!-- Left Photo Column -->
+        <div class="photo-column">
+            <div class="preview-wrapper">
+                @if (!string.IsNullOrEmpty(_photo1PreviewUrl))
+                {
+                    <img src="@_photo1PreviewUrl" alt="First photo preview" class="preview-image" />
+                }
+            </div>
+            <label for="firstPhotoInput" class="action-btn upload-btn">
+                Upload the first photo
+            </label>
+            <InputFile id="firstPhotoInput"
+                       class="hidden-file-input"
+                       OnChange="OnFirstPhotoSelected"
+                       accept="image/png, image/jpeg, image/jpg, image/webp, image/bmp, image/gif, image/*" hidden/>
+            @if (!string.IsNullOrEmpty(_photo1Error))
+            {
+                <span class="error-msg">@_photo1Error</span>
+            }
+        </div>
+
+        <!-- Right Photo Column -->
+        <div class="photo-column">
+            <div class="preview-wrapper">
+                @if (!string.IsNullOrEmpty(_photo2PreviewUrl))
+                {
+                    <img src="@_photo2PreviewUrl" alt="Second photo preview" class="preview-image" />
+                }
+            </div>
+            <label for="secondPhotoInput" class="action-btn upload-btn">
+                Upload the second photo
+            </label>
+            <InputFile id="secondPhotoInput"
+                       class="hidden-file-input"
+                       OnChange="OnSecondPhotoSelected"
+                       accept="image/png, image/jpeg, image/jpg, image/webp, image/bmp, image/gif, image/*" hidden/>
+            @if (!string.IsNullOrEmpty(_photo2Error))
+            {
+                <span class="error-msg">@_photo2Error</span>
+            }
+        </div>
+    </section>
+
+    <!-- Bottom Actions & Comparison Result Section -->
+    <footer class="app-footer">
+        <button class="action-btn compare-btn"
+                @onclick="CompareFaces"
+                disabled="@(!CanCompare || _isComparing)">
+            @if (_isComparing)
+            {
+                <span>Comparing...</span>
+            }
+            else
+            {
+                <span>Compare</span>
+            }
+        </button>
+
+        <div class="result-wrapper" style="visibility: @(_hasResult ? "visible" : "hidden");">
+            <div class="result-text @(_isMatch ? "match-text" : "no-match-text")">
+                @_resultText
+            </div>
+        </div>
+    </footer>
+</div>
+
+@code {
+    private IFaceDetectorWithLandmarks? _detector;
+    private IFaceEmbeddingsGenerator? _recognizer;
+
+    private byte[]? _photo1Bytes;
+    private string? _photo1PreviewUrl;
+    private string? _photo1Error;
+
+    private byte[]? _photo2Bytes;
+    private string? _photo2PreviewUrl;
+    private string? _photo2Error;
+
+    private bool _isComparing;
+    private bool _hasResult;
+    private bool _isMatch;
+    private string _resultText = string.Empty;
+
+    private bool CanCompare => _photo1Bytes != null && _photo2Bytes != null;
+
+    private (IFaceDetectorWithLandmarks Detector, IFaceEmbeddingsGenerator Recognizer) GetModels()
+    {
+        if (_detector == null || _recognizer == null)
+        {
+            _detector = FaceAiSharpBundleFactory.CreateFaceDetectorWithLandmarks();
+            _recognizer = FaceAiSharpBundleFactory.CreateFaceEmbeddingsGenerator();
+        }
+        return (_detector, _recognizer);
+    }
+
+    private async Task OnFirstPhotoSelected(InputFileChangeEventArgs e)
+    {
+        _photo1Error = null;
+        _hasResult = false;
+        var file = e.File;
+        if (!IsValidImageFile(file))
+        {
+            _photo1Error = "Please select a valid image file.";
+            return;
+        }
+
+        try
+        {
+            var bytes = await ReadFileBytesAsync(file);
+            using var testImg = Image.Load<Rgb24>(bytes);
+
+            _photo1Bytes = bytes;
+            _photo1PreviewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+        }
+        catch (Exception)
+        {
+            _photo1Error = "Failed to load image. Please choose another file.";
+            _photo1Bytes = null;
+            _photo1PreviewUrl = null;
+        }
+    }
+
+    private async Task OnSecondPhotoSelected(InputFileChangeEventArgs e)
+    {
+        _photo2Error = null;
+        _hasResult = false;
+        var file = e.File;
+        if (!IsValidImageFile(file))
+        {
+            _photo2Error = "Please select a valid image file.";
+            return;
+        }
+
+        try
+        {
+            var bytes = await ReadFileBytesAsync(file);
+            using var testImg = Image.Load<Rgb24>(bytes);
+
+            _photo2Bytes = bytes;
+            _photo2PreviewUrl = $"data:{file.ContentType};base64,{Convert.ToBase64String(bytes)}";
+        }
+        catch (Exception)
+        {
+            _photo2Error = "Failed to load image. Please choose another file.";
+            _photo2Bytes = null;
+            _photo2PreviewUrl = null;
+        }
+    }
+
+    private static bool IsValidImageFile(IBrowserFile file)
+    {
+        if (file == null) return false;
+
+        if (!string.IsNullOrEmpty(file.ContentType) &&
+            file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var ext = Path.GetExtension(file.Name).ToLowerInvariant();
+        return ext is ".jpg" or ".jpeg" or ".png" or ".bmp" or ".webp" or ".gif" or ".jfif" or ".tiff";
+    }
+
+    private static async Task<byte[]> ReadFileBytesAsync(IBrowserFile file)
+    {
+        const long maxAllowedSize = 30 * 1024 * 1024;
+        using var stream = file.OpenReadStream(maxAllowedSize);
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
+        return memoryStream.ToArray();
+    }
+
+    private async Task CompareFaces()
+    {
+        if (_photo1Bytes == null || _photo2Bytes == null || _isComparing)
+        {
+            return;
+        }
+
+        _isComparing = true;
+        _hasResult = false;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Run(() =>
+            {
+                using var img1 = Image.Load<Rgb24>(_photo1Bytes);
+                using var img2 = Image.Load<Rgb24>(_photo2Bytes);
+
+                var embedding1 = GenerateEmbeddingForImage(img1);
+                var embedding2 = GenerateEmbeddingForImage(img2);
+
+                var dotProduct = GeometryExtensions.Dot(embedding1, embedding2);
+
+                if (dotProduct >= 0.42f)
+                {
+                    _isMatch = true;
+                    _resultText = "That's a Match";
+                }
+                else
+                {
+                    _isMatch = false;
+                    _resultText = "Sorry you Don't Look a Like";
+                }
+
+                _hasResult = true;
+            });
+        }
+        catch (Exception)
+        {
+            _hasResult = true;
+            _isMatch = false;
+            _resultText = "Sorry you Don't Look a Like";
+        }
+        finally
+        {
+            _isComparing = false;
+            StateHasChanged();
+        }
+    }
+
+    private float[] GenerateEmbeddingForImage(Image<Rgb24> img)
+    {
+        var (detector, recognizer) = GetModels();
+        var faces = detector.DetectFaces(img);
+        if (faces.Count > 0 && faces.First().Landmarks != null)
+        {
+            recognizer.AlignFaceUsingLandmarks(img, faces.First().Landmarks!);
+        }
+        else
+        {
+            img.Mutate(x => x.Resize(112, 112));
+        }
+        return recognizer.GenerateEmbedding(img);
+    }
+}
