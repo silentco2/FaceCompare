@@ -61,8 +61,8 @@ release/
 │   └── FaceCompare.exe
 ```
 
-### 1. 🪟 Windows Release (`release/windows/`)
-- **Executable**: `release/windows/FaceCompare.exe`
+### 1. 🪟 Windows Release
+- **Executable**: Download the [Latest Release](https://github.com)
 - **Requirements**: Windows 10 (version 1809+) or Windows 11.
 ---
 
