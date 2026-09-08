@@ -63,16 +63,6 @@ release/
 
 ### 1. 🪟 Windows Release (`release/windows/`)
 - **Executable**: `release/windows/FaceCompare.exe`
-- **ZIP Package**: `release/FaceCompare-Windows-x64.zip`
-- **Build Command**:
-  ```powershell
-  dotnet publish -f net10.0-windows10.0.19041.0 -c Release -p:WindowsPackageType=None -o release/windows
-  ```
-- **Single-file EXE command**:
-  ```powershell
-  dotnet publish FaceCompare.csproj -f net10.0-windows10.0.19041.0 -c Release -p:WindowsPackageType=None -p:PublishSingleFile=true -p:SelfContained=false -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:UseAppHost=true -o release/singlefile
-  ```
-  This keeps the same MAUI Windows app while emitting a single executable file for the Windows target instead of the large folder publish bundle.
 - **Requirements**: Windows 10 (version 1809+) or Windows 11.
 ---
 
